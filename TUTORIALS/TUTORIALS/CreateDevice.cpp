@@ -72,7 +72,7 @@ HRESULT InitD3D(HWND hWnd)
 	return S_OK;
 }
 
-HRESULT CleanUp()
+VOID CleanUp()
 {
 	if (nullptr != g_pd3d)
 		g_pd3d->Release();
@@ -130,7 +130,7 @@ LRESULT	CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-INT APIENTRY WinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
+INT APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 {
 	//윈도우 클래스 등록
 	WNDCLASSEX wc =
@@ -183,7 +183,7 @@ INT APIENTRY WinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 
 		// 메세지 루프 진입
 		MSG msg;
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		while (GetMessage(&msg, nullptr, 0, 0))
 		{
 			//bool TranslateMessage(const MSG* lpmsg)
 			//virtual-key 메시지를 character 메시지로 변환
