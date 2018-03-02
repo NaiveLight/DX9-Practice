@@ -8,10 +8,27 @@
     <Filter Include="00.CreateDevice">
       <UniqueIdentifier>{9f4a2bf7-2fbb-4486-8373-c5092245f6f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.VertexBuffer">
+      <UniqueIdentifier>{69d7582e-6227-45d1-9b64-d7d54caf01a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99.Headers">
+      <UniqueIdentifier>{c4023127-7893-4036-961b-deedec6ecb2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CreateDevice.cpp">
       <Filter>00.CreateDevice</Filter>
     </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>01.VertexBuffer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>99.Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sturct.h">
+      <Filter>99.Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

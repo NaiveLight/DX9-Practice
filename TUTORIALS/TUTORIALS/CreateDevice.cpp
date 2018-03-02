@@ -1,6 +1,4 @@
-#include <d3d9.h>
-#include <Windows.h>
-#include <tchar.h>
+#include "stdafx.h"
 
 //	global variables
 LPDIRECT3D9			g_pd3d = nullptr;			// D3D장치를 생성하는데 사용됨
@@ -11,6 +9,12 @@ LPDIRECT3DDEVICE9	g_pd3dDevice = nullptr;	// Rendering Device
 //	Render:		Draw the scene.
 //	MsgProc:	Window Message handler
 //	WinMain:	Main (Application's entry point)
+
+HRESULT InitD3D(HWND hWnd);
+VOID CleanUp();
+VOID Render();
+LRESULT	CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+INT APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT);
 
 HRESULT InitD3D(HWND hWnd)
 {
@@ -81,7 +85,7 @@ VOID CleanUp()
 		g_pd3dDevice->Release();
 }
 
-VOID	Render()
+VOID Render()
 {
 	if (nullptr == g_pd3dDevice)
 		return;
