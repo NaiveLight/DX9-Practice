@@ -6,6 +6,8 @@ LPDIRECT3DDEVICE9		g_pd3dDevice;
 LPDIRECT3DVERTEXBUFFER9 g_pVB;
 
 // InitVB : Creates a vertex buffer and fills it with our vertices.
+//			Must use lock & unlock, when write our vertices to vertex buffer.
+//			D3D can also use Index buffer.
 
 HRESULT InitD3D(HWND hWnd);
 HRESULT InitVB();
@@ -51,6 +53,15 @@ HRESULT InitVB()
 		{ 250.f, 250.f, 0.5f, 1.f, 0xff00ff00 },
 	};
 
+	//HRESULT CreateVertexBuffer(
+	//	UINT Length,								// 버텍스 버퍼의 크기
+	//	DWORD Usage,								// 버텍스 버퍼의 종류 혹은 처리방식 지정, no usage value. 만일 사용할 시 D3DUSAGE 상수 사용 
+	//	DWORD FVF,									// 버텍스 구조체에 따라 선언된 FVF 플래그 값
+	//	D3DPOOL Pool,								// 정점 버퍼가 저장될 메모리 위치와 관리방식 지정
+	//	IDirect3DVertexBuffer9 **ppVertexBuffer,	// 
+	//	HANDLE *pSharedHandle						//
+	//)
+
 	if (FAILED(g_pd3dDevice->CreateVertexBuffer(
 		3 * sizeof(MYVERTEX),
 		0,
@@ -64,6 +75,13 @@ HRESULT InitVB()
 	}
 
 	VOID* pVertices;
+
+	//HRESULT Lock(
+	//	UINT OffsetToLock,	// lock을 걸 버퍼 대한 offset, 버텍스 버퍼 전체를 잠그려면 sizetolock과 offsettolock을 둘다 0으로 설정
+	//	UINT SizeToLock,	// lock을 걸 버퍼 크기 Bytes
+	//	VOID **ppbData,		// 반환된 정점 데이터를 가지고 있을 버퍼에 대한 포인터
+	//	DWORD Flags			// lock 유형에 대한 플래그
+	//)
 
 	if (FAILED(g_pVB->Lock(
 		0,
@@ -100,6 +118,15 @@ VOID Render()
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
+
+		//HRESULT SetStreamSource(
+
+		//	UINT StreamNumber,					// 0 로부터 스트림의 최대수 -1 까지의 범위의 데이터 스트림을 지정
+		//	IDirect3DVertexBuffer9 *pStreamData,// 바인딩할 버텍스 버퍼
+		//	UINT OffsetInBytes,					// 스트림의 처음부터 버텍스 데이터 시작 부분까지의 바이트 단위 오프셋
+		//	UINT Stride							// 컴포넌트의 폭
+		//);
+
 		g_pd3dDevice->SetStreamSource(
 			0,
 			g_pVB,
@@ -107,8 +134,10 @@ VOID Render()
 			sizeof(MYVERTEX)
 		);
 
+		// 버텍스 정보 설정
 		g_pd3dDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
 
+		// 그리기 IndexedPrimitive 알아봐야함.
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
 		g_pd3dDevice->EndScene();
