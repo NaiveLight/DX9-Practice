@@ -14,13 +14,19 @@
     <Filter Include="99.Headers">
       <UniqueIdentifier>{c4023127-7893-4036-961b-deedec6ecb2f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Matirces">
+      <UniqueIdentifier>{abf72116-1896-46ef-a31a-710d13b46ca4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CreateDevice.cpp">
+    <ClCompile Include="00_CreateDevice.cpp">
       <Filter>00.CreateDevice</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
+    <ClCompile Include="01_VertexBuffer.cpp">
       <Filter>01.VertexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="02_Matrices.cpp">
+      <Filter>02.Matirces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
