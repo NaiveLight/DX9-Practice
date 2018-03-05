@@ -6,4 +6,5 @@
 #include <tchar.h>
 #include <mmsystem.h>
 #include <strsafe.h>
+
 #include "Sturct.h"

@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
-// global variables
-LPDIRECT3D9				g_pd3d;
-LPDIRECT3DDEVICE9		g_pd3dDevice;
-LPDIRECT3DVERTEXBUFFER9 g_pVB;
+LPDIRECT3D9 g_pd3d = nullptr;
+LPDIRECT3DDEVICE9 g_pd3dDevice = nullptr;
+LPDIRECT3DVERTEXBUFFER9 g_pVB = nullptr;
 
 HRESULT InitD3D(HWND hWnd);
 HRESULT InitVB();
 VOID CleanUp();
 VOID SetUpMatrices();
+VOID SetUpLIghts();
 VOID Render();
 LRESULT	CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 INT APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT);
@@ -26,6 +26,10 @@ HRESULT InitD3D(HWND hWnd)
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
 
+	// 추가된 코드
+	d3dpp.EnableAutoDepthStencil = TRUE;
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+
 	if (FAILED(g_pd3d->CreateDevice(
 		D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
@@ -39,25 +43,17 @@ HRESULT InitD3D(HWND hWnd)
 
 	g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, false);
+	g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, true);
 
 	return S_OK;
 }
 
 HRESULT InitVB()
 {
-	MYGEOVERTEX vertices[] =
-	{
-		//	x, y, z, color
-		{ -1.0f,-1.0f, 0.0f, 0xffff0000, },
-		{ 1.0f,-1.0f, 0.0f, 0xff0000ff, },
-		{ 0.0f, 1.0f, 0.0f, 0xffffffff, },
-	};
-
 	if (FAILED(g_pd3dDevice->CreateVertexBuffer(
-		3 * sizeof(MYGEOVERTEX),
+		50 * 2 * sizeof(MY3DVERTEX),
 		0,
-		D3DFVF_XYZRHW | D3DFVF_DIFFUSE,
+		D3DFVF_XYZ | D3DFVF_NORMAL,
 		D3DPOOL_DEFAULT,
 		&g_pVB,
 		nullptr
@@ -66,15 +62,24 @@ HRESULT InitVB()
 		return E_FAIL;
 	}
 
-	VOID* pVertices;
+	MY3DVERTEX* pVertices;
 
-	if (FAILED(g_pVB->Lock(	0, sizeof(vertices), (void**)&pVertices, 0 ) ) )
+	if (FAILED(g_pVB->Lock(0, 0, (void**)&pVertices, 0)))
 	{
 		return E_FAIL;
 	}
 
-	memcpy(pVertices, vertices, sizeof(vertices));
 
+	// 위 아래가 뚫린 원기둥 (실린더) 생성
+	for (DWORD i = 0; i < 50; i++)
+	{
+		FLOAT theta = (2 * D3DX_PI * i) / (50 - 1);
+		pVertices[2 * 1 + 0].position = D3DXVECTOR3(sinf(theta), -1.f, cosf(theta));
+		pVertices[2 * 1 + 0].normal = D3DXVECTOR3(sinf(theta), 0.f, cosf(theta));
+		pVertices[2 * 1 + 1].position = D3DXVECTOR3(sinf(theta), 1.f, cosf(theta));
+		pVertices[2 * 1 + 1].normal = D3DXVECTOR3(sinf(theta), 0.f, cosf(theta));
+	}
+	
 	g_pVB->Unlock();
 
 	return S_OK;
@@ -97,15 +102,11 @@ VOID SetUpMatrices()
 	// Set World Matrix
 	D3DXMATRIXA16 matWorld;
 
-
-	ULONGLONG iTime = GetTickCount64() % 1000;
-	//UINT iTime = timeGetTime() % 1000;
-
-	// 1 rotate per 1000ms 
-	FLOAT fAngle = iTime * (2.0f * D3DX_PI) / 1000.0f;
-	D3DXMatrixRotationY(&matWorld, fAngle);
+	// 단위 행렬
+	D3DXMatrixIdentity(&matWorld);
+	// X축 회전
+	D3DXMatrixRotationX(&matWorld, GetTickCount64() / 500.f);
 	g_pd3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
-
 
 	// Set View Matrix
 	D3DXVECTOR3 vEyePt(0.0f, 3.0f, -5.0f);
@@ -121,18 +122,53 @@ VOID SetUpMatrices()
 	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, &matProj);
 }
 
+VOID SetUpLights()
+{
+	D3DMATERIAL9 mtrl;
+	ZeroMemory(&mtrl, sizeof(D3DMATERIAL9));
+	mtrl.Diffuse.r = mtrl.Ambient.r = 1.f;
+	mtrl.Diffuse.g = mtrl.Ambient.g = 1.f;
+	mtrl.Diffuse.b = mtrl.Ambient.b = 0.f;
+	mtrl.Diffuse.a = mtrl.Ambient.a = 1.f;
+
+	g_pd3dDevice->SetMaterial(&mtrl);
+
+	D3DXVECTOR3 vecDir;
+	D3DLIGHT9 light;
+	ZeroMemory(&light, sizeof(D3DLIGHT9));
+
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Diffuse.r = 1.f;
+	light.Diffuse.g = 1.f;
+	light.Diffuse.b = 1.f;
+
+	vecDir = D3DXVECTOR3(
+		cosf(GetTickCount64() / 350.f),
+		1.f,
+		sinf(GetTickCount64() / 350.f));
+
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vecDir);
+	light.Range = 1000.f;
+	g_pd3dDevice->SetLight(0, &light);
+	g_pd3dDevice->LightEnable(0, true);
+	g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, true);
+
+	g_pd3dDevice->SetRenderState(D3DRS_AMBIENT, 0x00202020);
+}
+
 VOID Render()
 {
-	g_pd3dDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.f, 0);
+	g_pd3dDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 255), 1.f, 0);
 
 	// BeginScene과 EndScene 사이는 최대한 짧은 것이 좋다.
+	SetUpLights();
 	SetUpMatrices();
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
-		g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(MYGEOVERTEX));
-		g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
-		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 1);
+		g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(MY3DVERTEX));
+		g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2*50 - 2);
 
 		g_pd3dDevice->EndScene();
 	}
@@ -164,9 +200,9 @@ INT APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	};
 	RegisterClassEx(&wc);
 
-	HWND hWnd = CreateWindow(__T("D3D Tutorial"), __T("02.Matrices"),
-	WS_OVERLAPPEDWINDOW, 100, 100, 300, 300,
-	nullptr, nullptr, wc.hInstance, nullptr);
+	HWND hWnd = CreateWindow(__T("D3D Tutorial"), __T("03.Matrices"),
+		WS_OVERLAPPEDWINDOW, 100, 100, 300, 300,
+		nullptr, nullptr, wc.hInstance, nullptr);
 
 	if (SUCCEEDED(InitD3D(hWnd)))
 	{
@@ -195,4 +231,3 @@ INT APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 
 	return 0;
 }
-

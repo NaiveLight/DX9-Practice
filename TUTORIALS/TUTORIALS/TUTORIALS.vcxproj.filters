@@ -17,6 +17,9 @@
     <Filter Include="02.Matirces">
       <UniqueIdentifier>{abf72116-1896-46ef-a31a-710d13b46ca4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Lights">
+      <UniqueIdentifier>{15b225f1-27a6-40e1-b1c4-25aec96acf12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="00_CreateDevice.cpp">
@@ -28,6 +31,9 @@
     <ClCompile Include="02_Matrices.cpp">
       <Filter>02.Matirces</Filter>
     </ClCompile>
+    <ClCompile Include="03_Lights.cpp">
+      <Filter>03.Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -36,5 +42,10 @@
     <ClInclude Include="Sturct.h">
       <Filter>99.Headers</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Sunpark\Desktop\PenguinB.fbx">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>
