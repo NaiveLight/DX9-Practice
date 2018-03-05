@@ -94,15 +94,20 @@ VOID CleanUp()
 
 VOID SetUpMatrices()
 {
+	// Set World Matrix
 	D3DXMATRIXA16 matWorld;
+
 
 	ULONGLONG iTime = GetTickCount64() % 1000;
 	//UINT iTime = timeGetTime() % 1000;
 
-	FLOAT fAngle = iTime * (1.0f * D3DX_PI) / 1000.0f;
+	// 1 rotate per 1000ms 
+	FLOAT fAngle = iTime * (2.0f * D3DX_PI) / 1000.0f;
 	D3DXMatrixRotationY(&matWorld, fAngle);
 	g_pd3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
 
+
+	// Set View Matrix
 	D3DXVECTOR3 vEyePt(0.0f, 3.0f, -5.0f);
 	D3DXVECTOR3 vLookatPt(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
@@ -110,6 +115,7 @@ VOID SetUpMatrices()
 	D3DXMatrixLookAtLH(&matView, &vEyePt, &vLookatPt, &vUpVec);
 	g_pd3dDevice->SetTransform(D3DTS_VIEW, &matView);
 
+	// Set Projection View
 	D3DXMATRIXA16 matProj;
 	D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4, 1.0f, 1.0f, 100.0f);
 	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, &matProj);
