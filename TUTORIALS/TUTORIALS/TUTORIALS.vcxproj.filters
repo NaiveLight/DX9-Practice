@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="C:\Users\Sunpark\Desktop\PenguinB.fbx">
-      <Filter>리소스 파일</Filter>
+      <Filter>00.CreateDevice</Filter>
     </None>
   </ItemGroup>
 </Project>
